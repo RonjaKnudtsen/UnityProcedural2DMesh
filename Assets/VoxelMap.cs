@@ -17,6 +17,10 @@ public class VoxelMap : MonoBehaviour {
 
     public MeshGenerator meshGenerator;
 
+    public bool getVoxelValue(int x, int y) {
+        return voxels[x, y];
+    }
+
     public void refreshPerlinNoiseMap() {
         AddPerlinNoise();
         DrawMap();
