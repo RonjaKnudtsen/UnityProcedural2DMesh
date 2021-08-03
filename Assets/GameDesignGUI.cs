@@ -33,6 +33,11 @@ public class GameDesignGUI : MonoBehaviour{
             voxelMap.refreshPerlinNoiseMap();
         }
         GUILayout.FlexibleSpace();
+        if (GUILayout.Button("Create Simplex Cubes")) {
+            voxelMap.AddSimplexNoise();
+            voxelMap.DrawCubes();
+        }
+        GUILayout.FlexibleSpace();
         if (GUILayout.Button("Create Cave")) {
             meshGenerator.createMesh();
         }

@@ -5,7 +5,11 @@ using UnityEngine;
 // TODO: we also need batching.. 
 // X and Y is flat to floor in this mesh, so we might need to flip it later,  in unity Y is up and  down. 
 
+
 public class MeshGenerator : MonoBehaviour {
+
+    
+    // Source: http://paulbourke.net/geometry/polygonise/ 
     public VoxelMap voxelMap;
     public float meshSize = 10f;
 
@@ -33,7 +37,17 @@ public class MeshGenerator : MonoBehaviour {
 
     public void createMesh() {
         Debug.Log("Create mesh");
+        // TriangulateMesh();
+        CreateTempBoxes();
 
+
+    }
+
+    private void TriangulateMesh() {
+
+    }
+
+    private void CreateTempBoxes() {
         squareSize = meshSize / voxelMap.resolution;
         halfSize = meshSize * 0.5f;
         for (int y = 0; y < voxelMap.resolution; y++) {
@@ -73,6 +87,8 @@ public class MeshGenerator : MonoBehaviour {
     private void TempColorVerticies() {
 
     }
+
+
 
 
 

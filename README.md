@@ -7,3 +7,5 @@ Testing out procedural generation.
 
 Unsure if we should put x,y from the perlin noise as x and z since we want the height to be the walls of our dungeon, but for now lets keep x,y as x,y. 
 Seems like unity "flipps" the images, so an easy fix is to do tiling -1 on x and y axis. For the image where we show the perlin noise.
+
+Unity version: 2020.3.14f1

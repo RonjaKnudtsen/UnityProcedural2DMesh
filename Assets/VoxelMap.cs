@@ -2,10 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using NoiseTest;
 
 // THE VOXEL MAP IS A REPRESENTATION OF A BIGGER WORLD. 
 // "voxel represents a value on a regular grid in three-dimensional space" - wikipedia
 public class VoxelMap : MonoBehaviour {
+    VoxelMap() {
+        openSimplex = new OpenSimplexNoise();
+    }
+    public OpenSimplexNoise openSimplex;
     public int resolution = 256;
     public float perlinOffsetX = 40;
     public float perlinOffsetY = 40;
@@ -14,8 +19,11 @@ public class VoxelMap : MonoBehaviour {
 
     public int size;
     private bool[,] voxels; // on and off values. 
+    private float[,,] voxels3D;
 
     public MeshGenerator meshGenerator;
+
+    public GameObject cubePrefab;
 
     public bool getVoxelValue(int x, int y) {
         return voxels[x, y];
@@ -27,6 +35,44 @@ public class VoxelMap : MonoBehaviour {
     }
 
     private void Awake() {
+        
+        //AddPerlinNoise();
+        //DrawMap();
+    }
+
+    public void AddSimplexNoise() {
+        
+
+        voxels3D = new float[resolution, resolution, resolution];
+        bool defaultState = false;
+        /*for (int y = 0; y < resolution; y++) {
+            for (int x = 0; x < resolution; x++) {
+                for(int z = 0; z < resolution; z++) {
+                    voxels3D[x, y, z] = 0f;
+                }
+            }
+        }*/
+
+        for (int y = 0; y < resolution; y++) {
+            for (int x = 0; x < resolution; x++) {
+                for(int z = 0; z < resolution; z++) {
+                    float xCoord = (float)x / resolution * perlinScale + perlinOffsetX; // must be between 0-1
+                    float yCoord = (float)y / resolution * perlinScale + perlinOffsetX;
+                    float zCoord = (float)z / resolution * perlinScale + perlinOffsetX;
+                    double d = openSimplex.Evaluate(xCoord, yCoord, zCoord);
+                    float v = (float)d;
+
+                    voxels3D[x, y, z] = v;
+                    
+                }
+
+                
+
+            }
+        }
+    }
+
+    private void AddPerlinNoise() {
         voxels = new bool[resolution, resolution];
         bool defaultState = false;
         for (int y = 0; y < resolution; y++) {
@@ -34,19 +80,17 @@ public class VoxelMap : MonoBehaviour {
                 voxels[x, y] = defaultState;
             }
         }
-        AddPerlinNoise();
-        DrawMap();
-    }
 
-    private void AddPerlinNoise() {
         for (int y = 0; y < resolution; y++) {
             for (int x = 0; x < resolution; x++) {
                 float xCoord = (float)x / resolution * perlinScale + perlinOffsetX; // must be between 0-1
                 float yCoord = (float)y / resolution * perlinScale + perlinOffsetY;
-                
 
-                float v = Mathf.PerlinNoise(xCoord, yCoord);
-                if(v < perlinThickness) {
+                double d = openSimplex.Evaluate(xCoord, yCoord);
+                float v2 = (float)d;
+
+                //float v = Mathf.PerlinNoise(xCoord, yCoord);
+                if(v2 < perlinThickness) {
                     voxels[x, y] = true;
                 } else {
                     voxels[x, y] = false;
@@ -55,6 +99,34 @@ public class VoxelMap : MonoBehaviour {
             }
         }
        
+    }
+
+    public void DrawCubes() {
+        for (int y = 0; y < resolution; y++) {
+            for (int x = 0; x < resolution; x++) {
+                for (int z = 0; z < resolution; z++) {
+
+
+                    // Check if true. 
+                    float squareSize = 0.5f;
+                    bool draw = voxels3D[x, y, z] > perlinThickness;
+
+                    if (draw) {
+                        GameObject o = Instantiate(cubePrefab) as GameObject;
+                        o.transform.parent = transform;
+                        o.name = $"Cube X:{x}, Y:{y}, Z{z}.";
+                        o.transform.localPosition = new Vector3((x + 0.5f) * squareSize, (y + 0.5f) * squareSize, (z + 0.5f) * squareSize);
+                        o.transform.localScale = Vector3.one * squareSize;
+
+                        
+                    }
+
+
+                    // Draw Cube.
+
+                }
+            }
+        }
     }
 
     private void DrawMap() {
@@ -76,26 +148,5 @@ public class VoxelMap : MonoBehaviour {
         renderer.material.mainTexture = texture;
     }
 
-    private void OnGUI() {
-       /* GUILayout.BeginArea(new Rect(4f, 4f, 150f, 500f), "area 1");
-        GUILayout.Label("Perlin parameters");
-        GUILayout.Label("Scale");
-        perlinScale = GUILayout.HorizontalSlider(perlinScale, 1f, 100f);
-        GUILayout.Label("Offset Horizontal");
-        perlinOffsetX = GUILayout.HorizontalSlider(perlinOffsetX, 0f, 1000f);
-        GUILayout.Label("Offset Vertical");
-        perlinOffsetY = GUILayout.HorizontalSlider(perlinOffsetY, 0f, 1000f);
-        GUILayout.Label("Thickness");
-        perlinThickness = GUILayout.HorizontalSlider(perlinThickness, 0.1f, 1f);
-
-        if (GUILayout.Button("Refresh")) {
-            Debug.Log("REFRESH");
-            refreshPerlinNoiseMap();
-        }
-        GUILayout.EndArea();
-        GUILayout.BeginArea(new Rect(4f, 4f, 150f, 500f), "area 2");
-        GUILayout.Label("Thickness");
-        GUILayout.EndArea();*/
-    }
 
 }
